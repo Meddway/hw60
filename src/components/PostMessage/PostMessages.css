@@ -1,0 +1,21 @@
+.divMessagesUser {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  border-style: solid;
+}
+
+.pAuthor, .pDate {
+  margin: 0;
+  padding-left: 5px;
+}
+
+.divAuthorDate {
+  display: flex;
+}
+
+.pMessages {
+  padding-left: 5px;
+  margin: 5px 0;
+}
+
