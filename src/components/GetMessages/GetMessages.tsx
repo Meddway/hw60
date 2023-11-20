@@ -12,32 +12,40 @@ interface Props {
 
 const GetMessages: React.FC<Props> = () => {
   const [messagesUser, setMessagesUser] = useState<Props[]>([]);
+  const [lastDate, setLastDate] = useState<string | null>(null);
+
+  const generateRandomKey = () => Math.random().toString(36);
   const getMessages = async () => {
     try {
-      const response = await fetch(url);
+      const urlWithDatetime = lastDate ? `${url}?datetime=${lastDate}` : url;
+      const response = await fetch(urlWithDatetime);
       const messagesUser: Props[] = await response.json();
-      const reverseMessagesUser = messagesUser.reverse();
-      const newMessageUser = reverseMessagesUser.map((message) => ({
-        ...message,
-      }));
-      setMessagesUser(newMessageUser);
-      console.log(newMessageUser);
+
+      const messagesWithKeys = messagesUser.map((message) => (
+        { ...message, id: generateRandomKey() }));
+
+      setMessagesUser((prevMessages) => [
+        ...messagesWithKeys,
+        ...prevMessages,
+      ]);
+      setLastDate(messagesUser.length > 0 ? messagesUser[messagesUser.length - 1].datetime : lastDate);
     } catch (error) {
       console.error('Error:', error);
     }
   };
 
   useEffect(() => {
-    setInterval(() => {
+    const interval = setInterval(() => {
       void getMessages();
     }, 3000);
+    return() => clearInterval(interval);
   }, []);
 
   return (
     <div>
-      {messagesUser.map((message) => (
+      {messagesUser.slice().reverse().map((message) => (
         <PostMessage
-          key={message.datetime}
+          key={message.id}
           message={message.message}
           author={message.author}
           datetime={message.datetime.slice(0, 16)}
